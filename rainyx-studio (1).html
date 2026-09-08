@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAINYX STUDIO — Rejoins le collectif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep: #100e2a;
+    --violet: #5b3bcf;
+    --azure: #2e7bf6;
+    --mint: #7ff4d1;
+    --coral: #ff6b81;
+    --text-hi: #f2f0ff;
+    --text-lo: #a8a3d6;
+    --line: rgba(242,240,255,0.14);
+    --field-bg: rgba(242,240,255,0.05);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--bg-deep);
+    color: var(--text-hi);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+  .field{
+    position:fixed; inset:0; z-index:0; overflow:hidden;
+    background:
+      radial-gradient(60% 50% at 20% 15%, rgba(91,59,207,0.55), transparent 60%),
+      radial-gradient(55% 45% at 85% 75%, rgba(46,123,246,0.45), transparent 60%),
+      var(--bg-deep);
+  }
+  .orb{
+    position:absolute; width:70vmax; height:70vmax; left:50%; top:38%;
+    transform:translate(-50%,-50%);
+    background: conic-gradient(from 0deg, var(--violet), var(--azure), var(--mint), var(--violet));
+    filter: blur(120px);
+    opacity:0.35;
+    border-radius:50%;
+    animation: swirl 26s linear infinite;
+  }
+  @keyframes swirl{ to{ transform:translate(-50%,-50%) rotate(360deg); } }
+  main{ position:relative; z-index:1; }
+  .lang-toggle{
+    position:fixed; top:1.4rem; right:1.4rem; z-index:10;
+    display:flex; background:rgba(16,14,42,0.6); backdrop-filter:blur(6px);
+    border:1px solid var(--line); border-radius:999px; padding:3px;
+    font-family:'Unbounded', sans-serif; font-size:0.72rem;
+  }
+  .lang-toggle button{
+    border:none; background:transparent; color:var(--text-lo);
+    padding:0.4rem 0.8rem; border-radius:999px; cursor:pointer;
+  }
+  .lang-toggle button.active{ background:linear-gradient(90deg, var(--violet), var(--azure)); color:var(--text-hi); }
+  .hero{
+    min-height:100svh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding: 8vh 6vw 10vh;
+  }
+  .eyebrow{ font-size:0.8rem; color:var(--text-lo); margin-bottom:1.4rem; }
+  .eyebrow b{ color:var(--mint); font-weight:600; }
+  h1{
+    font-family:'Unbounded', sans-serif;
+    font-weight:900;
+    line-height:0.98;
+    font-size: clamp(2.6rem, 11vw, 5.2rem);
+    letter-spacing:-0.01em;
+    max-width:12ch;
+  }
+  h1 span{
+    display:block;
+    background:linear-gradient(90deg, var(--mint), var(--azure) 55%, var(--violet));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lede{ margin-top:1.8rem; max-width:34ch; color:var(--text-lo); font-size:1.05rem; line-height:1.6; }
+  .join-btn{
+    display:inline-flex; align-items:center; gap:0.5rem;
+    margin-top:2.2rem; width:fit-content;
+    padding:0.9rem 1.6rem;
+    background:linear-gradient(90deg, var(--violet), var(--azure));
+    color:var(--text-hi); text-decoration:none;
+    font-family:'Unbounded', sans-serif; font-weight:500; font-size:0.95rem;
+    border-radius:999px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .join-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 24px rgba(46,123,246,0.35); }
+  .scroll-hint{ margin-top:2.4rem; display:flex; align-items:center; gap:0.6rem; color:var(--text-lo); font-size:0.85rem; }
+  .scroll-hint .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:0.3; } 50%{ opacity:1; } }
+  .roster{ padding: 4vh 6vw 12vh; }
+  .roster-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    border-bottom:1px solid var(--line);
+    padding-bottom:1.4rem; margin-bottom:0.4rem;
+    flex-wrap:wrap; gap:0.6rem;
+  }
+  .roster-head h2{ font-family:'Unbounded', sans-serif; font-weight:500; font-size:clamp(1.3rem, 3.5vw, 1.8rem); }
+  .roster-head span{ color:var(--text-lo); font-size:0.85rem; }
+  .role{ border-bottom:1px solid var(--line); }
+  .role-row{ display:flex; align-items:center; justify-content:space-between; padding:1.5rem 0; gap:1rem; cursor:pointer; }
+  .role-name{ font-family:'Unbounded', sans-serif; font-weight:500; font-size:clamp(1.3rem, 4.2vw, 2rem); transition: transform 0.35s ease, color 0.35s ease; }
+  .role-tag{ color:var(--text-lo); font-size:0.85rem; white-space:nowrap; }
+  .role-plus{ width:28px; height:28px; flex-shrink:0; position:relative; }
+  .role-plus::before, .role-plus::after{ content:''; position:absolute; background:var(--text-lo); top:50%; left:50%; transform:translate(-50%,-50%); transition: transform 0.35s ease, background 0.35s ease; }
+  .role-plus::before{ width:16px; height:1.5px; }
+  .role-plus::after{ width:1.5px; height:16px; }
+  .role-body{ max-height:0; overflow:hidden; transition: max-height 0.4s ease; }
+  .role-body-inner{ padding-bottom:1.8rem; }
+  .role-body p{ color:var(--text-lo); max-width:52ch; line-height:1.6; margin-bottom:1.2rem; font-size:0.95rem; }
+  .role.open .role-name{ color:var(--mint); transform:translateX(6px); }
+  .role.open .role-plus::after{ transform:translate(-50%,-50%) rotate(90deg); opacity:0; }
+  .role.open .role-plus::before{ background:var(--mint); }
+  .role-row:hover .role-name{ transform: translateX(6px); }
+  .apply-form{ display:flex; flex-direction:column; gap:0.9rem; max-width:440px; }
+  .apply-form label{ font-size:0.82rem; color:var(--text-lo); display:block; margin-bottom:0.4rem; }
+  .apply-form input, .apply-form textarea{
+    width:100%; background:var(--field-bg); border:1px solid var(--line);
+    border-radius:10px; padding:0.7rem 0.9rem; color:var(--text-hi);
+    font-family:'Inter', sans-serif; font-size:0.92rem;
+  }
+  .apply-form input:focus, .apply-form textarea:focus{ outline:2px solid var(--mint); outline-offset:1px; }
+  .apply-form textarea{ resize:vertical; min-height:70px; }
+  .submit-btn{
+    align-self:flex-start; margin-top:0.4rem;
+    padding:0.75rem 1.4rem; border:none; border-radius:999px; cursor:pointer;
+    background:linear-gradient(90deg, var(--mint), var(--azure));
+    color:#0d0c22; font-family:'Unbounded', sans-serif; font-weight:500; font-size:0.88rem;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .submit-btn:hover{ transform:translateY(-2px); }
+  .submit-btn:disabled{ opacity:0.5; cursor:default; transform:none; }
+  .status-msg{ font-size:0.85rem; margin-top:0.9rem; }
+  .status-msg.ok{ color:var(--mint); }
+  .status-msg.err{ color:var(--coral); }
+  .status-msg a{ color:var(--mint); font-weight:600; text-decoration:underline; }
+  footer{
+    padding: 4vh 6vw 5vh;
+    display:flex; justify-content:space-between; align-items:center;
+    color:var(--text-lo); font-size:0.8rem; flex-wrap:wrap; gap:0.6rem;
+    border-top:1px solid var(--line);
+  }
+  footer strong{ color:var(--text-hi); }
+  footer a{ color:var(--text-lo); }
+  @media (max-width:520px){ .role-tag{ display:none; } }
+  .report-fab{
+    position:fixed; bottom:1.4rem; right:1.4rem; z-index:20;
+    padding:0.8rem 1.3rem; border:none; border-radius:999px; cursor:pointer;
+    background:rgba(16,14,42,0.75); backdrop-filter:blur(6px);
+    border:1px solid var(--line); color:var(--text-hi);
+    font-family:'Unbounded', sans-serif; font-size:0.8rem;
+  }
+  .report-fab:hover{ border-color:var(--coral); color:var(--coral); }
+  .overlay{
+    position:fixed; inset:0; z-index:30;
+    background:rgba(8,7,24,0.72); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center; padding:6vw;
+  }
+  .overlay.show{ display:flex; }
+  .overlay-panel{
+    background:#161233; border:1px solid var(--line); border-radius:16px;
+    padding:1.8rem; max-width:440px; width:100%;
+    max-height:85vh; overflow-y:auto;
+  }
+  .overlay-panel h3{
+    font-family:'Unbounded', sans-serif; font-weight:500; font-size:1.2rem; margin-bottom:1.2rem;
+  }
+  .overlay-close{
+    float:right; background:none; border:none; color:var(--text-lo);
+    font-size:0.8rem; cursor:pointer;
+  }
+  .admin-link{
+    background:none; border:none; color:var(--text-lo); font-size:0.8rem;
+    cursor:pointer; text-decoration:underline; padding:0;
+  }
+  .admin-open-btn{
+    display:inline-block; margin-top:1rem; padding:0.7rem 1.2rem;
+    background:linear-gradient(90deg, var(--violet), var(--azure));
+    color:var(--text-hi); text-decoration:none; border-radius:999px;
+    font-family:'Unbounded', sans-serif; font-size:0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-toggle">
+  <button id="btn-fr" class="active">FR</button>
+  <button id="btn-en">EN</button>
+</div>
+
+<div class="field"><div class="orb"></div></div>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow" id="txt-eyebrow"></div>
+    <h1 id="txt-h1"></h1>
+    <p class="lede" id="txt-lede"></p>
+    <a class="join-btn" id="txt-joinbtn" href="https://discord.gg/CVWZWwyXms" target="_blank" rel="noopener"></a>
+    <div class="scroll-hint"><div class="dot"></div><span id="txt-scrollhint"></span></div>
+  </section>
+
+  <section class="roster" id="roles">
+    <div class="roster-head">
+      <h2 id="txt-rosterhead"></h2>
+      <span id="txt-rostersub"></span>
+    </div>
+    <div id="roster-list"></div>
+  </section>
+
+  <footer>
+    <div><strong>Rainyx Studio</strong> <span id="txt-footer"></span></div>
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <a href="https://discord.gg/CVWZWwyXms" target="_blank" rel="noopener">discord.gg/CVWZWwyXms</a>
+      <button class="admin-link" id="btn-admin-open"></button>
+    </div>
+  </footer>
+</main>
+
+<button class="report-fab" id="btn-report-open"></button>
+
+<div class="overlay" id="report-overlay">
+  <div class="overlay-panel">
+    <button class="overlay-close" id="report-close">✕</button>
+    <h3 id="report-title"></h3>
+    <form class="apply-form" id="report-form">
+      <div>
+        <label for="report-pseudo" id="report-pseudo-label"></label>
+        <input id="report-pseudo" type="text">
+      </div>
+      <div>
+        <label for="report-desc" id="report-desc-label"></label>
+        <textarea id="report-desc" required></textarea>
+      </div>
+      <button type="submit" class="submit-btn" id="report-submit-btn"></button>
+      <div class="status-msg" id="report-status"></div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="admin-overlay">
+  <div class="overlay-panel">
+    <button class="overlay-close" id="admin-close">✕</button>
+    <h3 id="admin-title"></h3>
+    <div id="admin-locked">
+      <input type="password" id="admin-pass" placeholder="">
+      <button class="submit-btn" id="admin-unlock-btn" style="margin-top:0.9rem;"></button>
+      <div class="status-msg err" id="admin-error" style="display:none;"></div>
+    </div>
+    <div id="admin-unlocked" style="display:none;">
+      <a class="admin-open-btn" href="https://discord.gg/CVWZWwyXms" target="_blank" rel="noopener" id="admin-open-link"></a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Webhooks séparés - comme demandé
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1546654211436191895/RML7CkWNRQATUcHXnHgb4N9tSziLQAiS-QeQdabrs-t4KAVZ4l0zko5POXQ8IC-USfbz"; // backup ancien
+  const CANDIDATURE_WEBHOOKS = [
+    "https://discord.com/api/webhooks/1546673297448763492/E9_K6S-VOQzQ7a5g8XRIqVpX6Fgm4ZlH6Y5Lv6JcJlJwkfVcjYL9e2fwfFYSd-cuEvke"
+  ];
+  const REPORT_WEBHOOK_URL = "https://discord.com/api/webhooks/1546676919372742769/DGvHAqCCqWdkQ-Z2XeFObtjEKrdQGoWweWDzoj7SOFwmvA_6aXLhEhh8pIpXfpaaFrFK";
+
+  const UI = {
+    fr: {
+      eyebrow: 'Recrutement ouvert — <b>7 places</b> cette saison',
+      h1: 'On monte<br>une équipe<span>qui frappe fort.</span>',
+      lede: "Rainyx Studio réunit devs, créateurs, artistes et monteurs sur un seul projet. Pas de hiérarchie lourde — juste du travail sérieux et des gens qui avancent ensemble.",
+      joinbtn: 'Rejoindre le Discord',
+      scrollhint: 'Ou postule directement plus bas',
+      rosterhead: 'Postes ouverts',
+      rostersub: 'Clique pour postuler',
+      footer: '— collectif créatif',
+      submit: 'Envoyer ma candidature',
+      sending: 'Envoi...',
+      sent: 'Envoyée ✓',
+      ok: 'Merci pour votre candidature, on va la regarder. Rejoins le serveur Discord pour avoir la réponse :',
+      err: "Erreur d'envoi — réessaie ou postule directement sur le Discord.",
+      reportBtn: 'Signalement',
+      reportTitle: 'Faire un signalement',
+      reportPseudo: 'Pseudo Discord (optionnel)',
+      reportDesc: 'Décris ton signalement',
+      reportSubmit: 'Envoyer le signalement',
+      reportOk: 'Merci pour votre signalement, on va lire ce que vous avez dit. Rejoins le serveur Discord :',
+      reportErr: "Erreur d'envoi — réessaie ou signale directement sur le Discord.",
+      reportClose: 'Fermer',
+      adminLabel: 'Admin',
+      adminPassPlaceholder: 'Mot de passe',
+      adminUnlock: 'Déverrouiller',
+      adminWrong: 'Mot de passe incorrect.',
+      adminOpen: 'Ouvrir les candidatures & signalements sur Discord'
+    },
+    en: {
+      eyebrow: 'Recruitment open — <b>7 spots</b> this season',
+      h1: "We're building<br>a team<span>that hits hard.</span>",
+      lede: "Rainyx Studio brings together devs, creators, artists and editors on one project. No heavy hierarchy — just serious work and people who move forward together.",
+      joinbtn: 'Join the Discord',
+      scrollhint: 'Or apply directly below',
+      rosterhead: 'Open positions',
+      rostersub: 'Click to apply',
+      footer: '— creative collective',
+      submit: 'Send my application',
+      sending: 'Sending...',
+      sent: 'Sent ✓',
+      ok: "Thanks for your application, we'll look at it. Join the Discord server to get the reply:",
+      err: 'Send error — try again or apply directly on Discord.',
+      reportBtn: 'Report',
+      reportTitle: 'Make a report',
+      reportPseudo: 'Discord username (optional)',
+      reportDesc: 'Describe your report',
+      reportSubmit: 'Send report',
+      reportOk: "Thanks for your report, we'll read what you wrote. Join the Discord server:",
+      reportErr: 'Send error — try again or report directly on Discord.',
+      reportClose: 'Close',
+      adminLabel: 'Admin',
+      adminPassPlaceholder: 'Password',
+      adminUnlock: 'Unlock',
+      adminWrong: 'Wrong password.',
+      adminOpen: 'Open applications & reports on Discord'
+    }
+  };
+
+  const ADMIN_PASSWORD = 'rainyx2026';
+
+  const roles = [
+    { fr:{ name:"Développeur", tag:"Bots, sites, outils",
+        desc:"Tu codes des bots Discord, des sites ou des outils internes. On ne demande pas un CV — on demande un lien vers un projet que tu as fini.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Lien vers un projet (GitHub, bot, site)","Langages / outils que tu maîtrises"] },
+      en:{ name:"Developer", tag:"Bots, sites, tools",
+        desc:"You code Discord bots, websites or internal tools. We don't ask for a resume — we ask for a link to a project you've finished.",
+        fields:["Discord username (with #tag or @)","Link to a project (GitHub, bot, site)","Languages / tools you know"] },
+      types:["text","text","text"] },
+    { fr:{ name:"Créateur", tag:"TikTok, Insta, YouTube",
+        desc:"Tu sais tenir une audience et poster régulièrement. On cherche quelqu'un qui comprend le rythme des plateformes, pas juste qui aime filmer.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Lien de ta chaîne / compte principal","Plateforme principale"] },
+      en:{ name:"Creator", tag:"TikTok, Insta, YouTube",
+        desc:"You know how to hold an audience and post consistently. We're looking for someone who understands platform rhythm, not just someone who likes filming.",
+        fields:["Discord username (with #tag or @)","Link to your main channel / account","Main platform"] },
+      types:["text","text","text"] },
+    { fr:{ name:"Artiste", tag:"Rap, prod, écriture",
+        desc:"Rappeur, beatmaker ou parolier — tu as déjà sorti quelque chose, même en freestyle. On veut entendre ta voix, pas lire ta bio.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Lien vers un morceau ou freestyle","Ton rôle (rappeur / beatmaker / parolier)"] },
+      en:{ name:"Artist", tag:"Rap, production, writing",
+        desc:"Rapper, beatmaker or lyricist — you've already released something, even a freestyle. We want to hear your voice, not read your bio.",
+        fields:["Discord username (with #tag or @)","Link to a track or freestyle","Your role (rapper / beatmaker / lyricist)"] },
+      types:["text","text","text"] },
+    { fr:{ name:"Streamer", tag:"Twitch, Kick, live",
+        desc:"Tu streames régulièrement, même petite audience. On cherche de la régularité et une vraie communauté, pas des chiffres gonflés.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Lien de ta chaîne","Plateforme (Twitch / Kick / YouTube)"] },
+      en:{ name:"Streamer", tag:"Twitch, Kick, live",
+        desc:"You stream regularly, even with a small audience. We're looking for consistency and a real community, not inflated numbers.",
+        fields:["Discord username (with #tag or @)","Link to your channel","Platform (Twitch / Kick / YouTube)"] },
+      types:["text","text","text"] },
+    { fr:{ name:"Monteur", tag:"Clips, reels, montage",
+        desc:"Tu transformes des rushs bruts en clips qui retiennent l'attention en 3 secondes. Montre-nous un avant/après.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Lien vers un montage","Logiciel utilisé"] },
+      en:{ name:"Editor", tag:"Clips, reels, editing",
+        desc:"You turn raw footage into clips that hold attention in 3 seconds. Show us a before/after.",
+        fields:["Discord username (with #tag or @)","Link to an edit","Software used"] },
+      types:["text","text","text"] },
+    { fr:{ name:"Designer", tag:"Logos, thumbnails",
+        desc:"Tu conçois des identités visuelles cohérentes — pas juste des thumbnails isolées. Un portfolio, même petit, suffit.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Lien vers ton portfolio","Logiciel utilisé"] },
+      en:{ name:"Designer", tag:"Logos, thumbnails",
+        desc:"You design consistent visual identities — not just standalone thumbnails. A portfolio, even a small one, is enough.",
+        fields:["Discord username (with #tag or @)","Link to your portfolio","Software used"] },
+      types:["text","text","text"] },
+    { fr:{ name:"Autre talent", tag:"Surprends-nous",
+        desc:"Tu as une compétence utile qui ne rentre dans aucune case ci-dessus ? Dis-nous ce que tu sais faire et pourquoi ça compte.",
+        fields:["Pseudo Discord (avec le #tag ou @)","Décris ta compétence","Lien si tu en as un"] },
+      en:{ name:"Other talent", tag:"Surprise us",
+        desc:"You have a useful skill that doesn't fit any box above? Tell us what you can do and why it matters.",
+        fields:["Discord username (with #tag or @)","Describe your skill","Link if you have one"] },
+      types:["text","textarea","text"] }
+  ];
+
+  let currentLang = 'fr';
+
+  function renderStatic(lang){
+    const t = UI[lang];
+    document.getElementById('html-root').lang = lang;
+    document.getElementById('txt-eyebrow').innerHTML = t.eyebrow;
+    document.getElementById('txt-h1').innerHTML = t.h1;
+    document.getElementById('txt-lede').textContent = t.lede;
+    document.getElementById('txt-joinbtn').textContent = t.joinbtn;
+    document.getElementById('txt-scrollhint').textContent = t.scrollhint;
+    document.getElementById('txt-rosterhead').textContent = t.rosterhead;
+    document.getElementById('txt-rostersub').textContent = t.rostersub;
+    document.getElementById('txt-footer').textContent = t.footer;
+    document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-report-open').textContent = t.reportBtn;
+    document.getElementById('report-title').textContent = t.reportTitle;
+    document.getElementById('report-pseudo-label').textContent = t.reportPseudo;
+    document.getElementById('report-desc-label').textContent = t.reportDesc;
+    document.getElementById('report-submit-btn').textContent = t.reportSubmit;
+    document.getElementById('report-close').textContent = t.reportClose;
+    document.getElementById('btn-admin-open').textContent = t.adminLabel;
+    document.getElementById('admin-title').textContent = t.adminLabel;
+    document.getElementById('admin-pass').placeholder = t.adminPassPlaceholder;
+    document.getElementById('admin-unlock-btn').textContent = t.adminUnlock;
+    document.getElementById('admin-error').textContent = t.adminWrong;
+    document.getElementById('admin-open-link').textContent = t.adminOpen;
+    document.getElementById('admin-close').textContent = t.reportClose;
+  }
+
+  function renderRoster(lang){
+    const t = UI[lang];
+    const list = document.getElementById('roster-list');
+    list.innerHTML = '';
+    roles.forEach((role, i) => {
+      const r = role[lang];
+      const el = document.createElement('div');
+      el.className = 'role';
+      el.innerHTML = `
+        <div class="role-row" data-toggle="${i}">
+          <div class="role-name">${r.name}</div>
+          <div class="role-tag">${r.tag}</div>
+          <div class="role-plus"></div>
+        </div>
+        <div class="role-body">
+          <div class="role-body-inner">
+            <p>${r.desc}</p>
+            <form class="apply-form" data-role-index="${i}">
+              ${r.fields.map((label, fi) => `
+                <div>
+                  <label for="r${i}f${fi}">${label}</label>
+                  ${role.types[fi] === 'textarea'
+                    ? `<textarea id="r${i}f${fi}" required></textarea>`
+                    : `<input id="r${i}f${fi}" type="text" required>`}
+                </div>
+              `).join('')}
+              <button type="submit" class="submit-btn">${t.submit}</button>
+              <div class="status-msg"></div>
+            </form>
+          </div>
+        </div>
+      `;
+      list.appendChild(el);
+    });
+    bindRosterEvents(lang);
+  }
+
+  function bindRosterEvents(lang){
+    const t = UI[lang];
+    document.querySelectorAll('.role-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const parent = row.parentElement;
+        const wasOpen = parent.classList.contains('open');
+        document.querySelectorAll('.role.open').forEach(r => {
+          r.classList.remove('open');
+          r.querySelector('.role-body').style.maxHeight = null;
+        });
+        if (!wasOpen) {
+          parent.classList.add('open');
+          const body = parent.querySelector('.role-body');
+          body.style.maxHeight = body.scrollHeight + 'px';
+        }
+      });
+    });
+
+    document.querySelectorAll('.apply-form').forEach(form => {
+      if(!form.dataset.roleIndex) return; // ignore report form
+      form.addEventListener('click', e => e.stopPropagation());
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const idx = parseInt(form.dataset.roleIndex, 10);
+        const role = roles[idx];
+        const r = role[lang];
+        const statusEl = form.querySelector('.status-msg');
+        const btn = form.querySelector('.submit-btn');
+        const values = r.fields.map((label, fi) => ({
+          label,
+          value: form.querySelector(`#r${idx}f${fi}`).value.trim()
+        }));
+
+        btn.disabled = true;
+        btn.textContent = t.sending;
+        statusEl.textContent = '';
+        statusEl.className = 'status-msg';
+
+        const payload = {
+          embeds: [{
+            title: `Nouvelle candidature — ${r.name} (${lang.toUpperCase()})`,
+            color: 5996239,
+            fields: values.map(v => ({ name: v.label, value: v.value || '—', inline: false })),
+            timestamp: new Date().toISOString()
+          }]
+        };
+
+        try {
+          // Envoie sur les 2 webhooks pour être sûr de recevoir
+          const results = await Promise.allSettled(
+            CANDIDATURE_WEBHOOKS.map(url => fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            }))
+          );
+          const ok = results.some(r => r.status === 'fulfilled' && (r.value.ok || r.value.status === 204));
+          if (ok) {
+            statusEl.innerHTML = `${t.ok} <a href="https://discord.gg/CVWZWwyXms" target="_blank" rel="noopener">discord.gg/CVWZWwyXms</a>`;
+            statusEl.classList.add('ok');
+            form.reset();
+            btn.textContent = t.sent;
+          } else {
+            throw new Error('all webhooks failed');
+          }
+        } catch (err) {
+          statusEl.textContent = t.err;
+          statusEl.classList.add('err');
+          btn.disabled = false;
+          btn.textContent = t.submit;
+        }
+      });
+    });
+  }
+
+  function setLang(lang){
+    currentLang = lang;
+    renderStatic(lang);
+    renderRoster(lang);
+  }
+
+  document.getElementById('btn-fr').addEventListener('click', () => setLang('fr'));
+  document.getElementById('btn-en').addEventListener('click', () => setLang('en'));
+  const browserLang = (navigator.language || 'fr').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+  setLang(browserLang);
+
+  // ---- Report panel ----
+  const reportOverlay = document.getElementById('report-overlay');
+  document.getElementById('btn-report-open').addEventListener('click', () => reportOverlay.classList.add('show'));
+  document.getElementById('report-close').addEventListener('click', () => reportOverlay.classList.remove('show'));
+  reportOverlay.addEventListener('click', (e) => { if (e.target === reportOverlay) reportOverlay.classList.remove('show'); });
+
+  document.getElementById('report-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const t = UI[currentLang];
+    const pseudo = document.getElementById('report-pseudo').value.trim();
+    const desc = document.getElementById('report-desc').value.trim();
+    const statusEl = document.getElementById('report-status');
+    const btn = document.getElementById('report-submit-btn');
+
+    btn.disabled = true;
+    btn.textContent = t.sending;
+    statusEl.textContent = '';
+    statusEl.className = 'status-msg';
+
+    try {
+      const res = await fetch(REPORT_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: `Nouveau signalement (${currentLang.toUpperCase()})`,
+            color: 16734081,
+            fields: [
+              { name: 'Pseudo Discord', value: pseudo || '—', inline: false },
+              { name: 'Signalement', value: desc || '—', inline: false }
+            ],
+            timestamp: new Date().toISOString()
+          }]
+        })
+      });
+      if (res.status === 204 || res.ok) {
+        statusEl.innerHTML = `${t.reportOk} <a href="https://discord.gg/CVWZWwyXms" target="_blank" rel="noopener">discord.gg/CVWZWwyXms</a>`;
+        statusEl.classList.add('ok');
+        document.getElementById('report-form').reset();
+        btn.textContent = t.sent;
+      } else {
+        throw new Error('not ok: ' + res.status);
+      }
+    } catch (err) {
+      statusEl.textContent = t.reportErr;
+      statusEl.classList.add('err');
+      btn.disabled = false;
+      btn.textContent = t.reportSubmit;
+    }
+  });
+
+  // ---- Admin panel ----
+  const adminOverlay = document.getElementById('admin-overlay');
+  document.getElementById('btn-admin-open').addEventListener('click', () => adminOverlay.classList.add('show'));
+  document.getElementById('admin-close').addEventListener('click', () => adminOverlay.classList.remove('show'));
+  adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) adminOverlay.classList.remove('show'); });
+
+  document.getElementById('admin-unlock-btn').addEventListener('click', () => {
+    const pass = document.getElementById('admin-pass').value;
+    const errorEl = document.getElementById('admin-error');
+    if (pass === ADMIN_PASSWORD) {
+      document.getElementById('admin-locked').style.display = 'none';
+      document.getElementById('admin-unlocked').style.display = 'block';
+      errorEl.style.display = 'none';
+    } else {
+      errorEl.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
